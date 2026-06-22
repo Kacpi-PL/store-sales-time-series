@@ -1,0 +1,14 @@
+__pycache__/
+docs/
+venv/
+notebooks/
+old/
+tests/
+*.md
+!README.md
+*.csv
+# logs, IDE, generated files
+*.log
+.idea/
+/submission.csv
+*.zip
