@@ -3,7 +3,6 @@ docs/
 venv/
 notebooks/
 old/
-tests/
 *.md
 !README.md
 *.csv
