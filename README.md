@@ -1,5 +1,7 @@
 # Store Sales - Time Series Forecasting
 
+[![CI](https://github.com/Kacpi-PL/store-sales-time-series/actions/workflows/ci.yml/badge.svg)](https://github.com/Kacpi-PL/store-sales-time-series/actions/workflows/ci.yml)
+
 Forecasting daily sales per store and product family for the Ecuadorian retailer
 Corporacion Favorita, using gradient-boosted trees (XGBoost).
 
@@ -57,8 +59,14 @@ pip install -r requirements.txt
 ## Usage
 
 ```
-python -m src.train      # fit, print validation RMSLE, save models/
+python -m src.train      # fit, print validation RMSLE, save models/, log an MLflow run
 python -m src.predict    # write submission.csv
+```
+
+Training logs each run to MLflow (SQLite backend). Browse and compare runs with:
+
+```
+python -m mlflow ui --backend-store-uri sqlite:///mlflow.db
 ```
 
 ## Results
@@ -80,12 +88,16 @@ tuning.
 ## Roadmap
 
 This started as a single notebook and is being rebuilt into a structured, reproducible,
-tested project. Planned next steps:
+tested project.
+
+In progress:
+
+- pytest tests and schema validation on the raw data (first tests landed; more coverage to come)
+- GitHub Actions CI (pytest runs on every push/PR; lint gate and status badge still to add)
+
+Planned:
 
 - `onpromotion` lags and rolling features
 - TimeSeriesSplit cross-validation instead of a single holdout
-- MLflow for experiment tracking
-- pytest tests and schema validation on the raw data
-- GitHub Actions CI (lint and tests)
 - Dockerfile and a Makefile for one-command setup / train / predict
 - FastAPI `/predict` endpoint and a cloud-deployed demo
