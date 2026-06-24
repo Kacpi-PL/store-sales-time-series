@@ -1,15 +1,20 @@
+import mlflow
+import mlflow.xgboost
 import json
-
 import numpy as np
 import xgboost as xgb
 from sklearn.metrics import mean_squared_error
-
 from src.config import cfg
 from src.data import load_raw
 from src.features import build_train_features
 
 
 def main():
+
+    mlflow.set_tracking_uri(f"sqlite:///{cfg.mlflow_db.resolve().as_posix()}")
+    mlflow.set_experiment(cfg.experiment_name)
+    mlflow.xgboost.autolog()
+
     raw = load_raw()
     X, y, dates, feature_cols = build_train_features(raw)
 
@@ -23,16 +28,21 @@ def main():
         early_stopping_rounds=cfg.early_stopping_rounds,
     )
     model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=50)
+    with mlflow.start_run():
+        val_pred = model.predict(X_val)
+        rmsle = np.sqrt(mean_squared_error(y_val, val_pred))
+        print(f"best iteration: {model.best_iteration} | validation RMSLE: {rmsle:.5f}")
 
-    val_pred = model.predict(X_val)
-    rmsle = np.sqrt(mean_squared_error(y_val, val_pred))
-    print(f"best iteration: {model.best_iteration} | validation RMSLE: {rmsle:.5f}")
+        cfg.models_dir.mkdir(parents=True, exist_ok=True)
+        model.save_model(cfg.models_dir / "model.json")
+        with open(cfg.models_dir / "feature_columns.json", "w") as f:
+            json.dump(feature_cols, f)
+        print(f"saved model + feature_columns to {cfg.models_dir}")
 
-    cfg.models_dir.mkdir(parents=True, exist_ok=True)
-    model.save_model(cfg.models_dir / "model.json")
-    with open(cfg.models_dir / "feature_columns.json", "w") as f:
-        json.dump(feature_cols, f)
-    print(f"saved model + feature_columns to {cfg.models_dir}")
+        mlflow.log_metric("val_rmsle", rmsle)
+        mlflow.log_param("n_features", len(feature_cols))
+        mlflow.log_artifact(str(cfg.models_dir / "model.json"))
+        mlflow.log_artifact(str(cfg.models_dir / "feature_columns.json"))
 
 
 if __name__ == "__main__":

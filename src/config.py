@@ -10,6 +10,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 @dataclass(frozen=True)
 class Config:
     # paths
+    mlflow_db: Path = PROJECT_ROOT / "mlflow.db"
+    experiment_name: str = "store-sales"
     raw_data_dir: Path = PROJECT_ROOT / "data" / "raw"
     processed_data_dir: Path = PROJECT_ROOT / "data" / "processed"
     models_dir: Path = PROJECT_ROOT / "models"

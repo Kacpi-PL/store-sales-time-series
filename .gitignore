@@ -1,6 +1,7 @@
 __pycache__/
 docs/
 venv/
+.venv/
 notebooks/
 old/
 *.md
@@ -8,6 +9,8 @@ old/
 *.csv
 # logs, IDE, generated files
 *.log
+mlflow.db
+mlruns/
 .idea/
 /submission.csv
 *.zip
