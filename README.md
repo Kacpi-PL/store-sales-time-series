@@ -93,7 +93,7 @@ tested project.
 In progress:
 
 - pytest tests and schema validation on the raw data (first tests landed; more coverage to come)
-- GitHub Actions CI (pytest runs on every push/PR; lint gate and status badge still to add)
+- GitHub Actions CI (pytest runs on every push/PR, with a status badge; lint gate still to add)
 
 Planned:
 
