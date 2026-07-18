@@ -138,4 +138,4 @@ honest number.
 | API – live `/forecast` service on the bundled data | done |
 | Docker – container image, pushed to Amazon ECR | done |
 | AWS deploy – ECS Express Mode via Terraform, public HTTPS URL | done |
-| CI/CD – build, push and deploy automatically on every change | planned |
+| CI/CD – GitHub Actions (OIDC) builds, pushes to ECR and deploys on every push | done |
