@@ -13,6 +13,7 @@ class Config:
     mlflow_db: Path = PROJECT_ROOT / "mlflow.db"
     experiment_name: str = "store-sales"
     raw_data_dir: Path = PROJECT_ROOT / "data" / "raw"
+    serve_data_dir: Path = PROJECT_ROOT / "data" / "serve"
     processed_data_dir: Path = PROJECT_ROOT / "data" / "processed"
     models_dir: Path = PROJECT_ROOT / "models"
     submission_path: Path = PROJECT_ROOT / "submission.csv"

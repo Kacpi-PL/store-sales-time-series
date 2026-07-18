@@ -7,6 +7,7 @@ old/
 *.md
 !README.md
 *.csv
+!data/serve/*.csv
 # logs, IDE, generated files
 *.log
 mlflow.db
