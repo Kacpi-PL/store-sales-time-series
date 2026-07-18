@@ -18,7 +18,7 @@ def preprocess_holidays(holidays) -> pd.DataFrame:
 
     # Transferred holidays didn't happen on this date -> zero their flags
     holiday_columns = ['type_Holiday', 'type_Event', 'locale_Local', 'locale_National', 'is_christmas', 'is_carnaval']
-    holidays.loc[holidays['transferred'] == True, holiday_columns] = 0
+    holidays.loc[holidays['transferred'], holiday_columns] = 0
     holidays = holidays.drop(columns=['transferred'])
 
     # Collapse to one row per date so the merge onto sales stays 1-to-1
@@ -71,7 +71,7 @@ def add_sales_lags_test(test, train) -> pd.DataFrame:
 def add_holiday_distance(df, holidays_raw) -> pd.DataFrame:
     # National days off only; a transferred holiday moves to a 'Transfer' row, so keep those
     nat = holidays_raw[(holidays_raw['locale'] == 'National') &
-                       (holidays_raw['transferred'] == False) &
+                       (~holidays_raw['transferred']) &
                        (holidays_raw['type'].isin(['Holiday', 'Transfer', 'Additional', 'Bridge']))]
     hol = pd.DataFrame({'date': sorted(nat['date'].unique())})
     hol['hol_date'] = hol['date']

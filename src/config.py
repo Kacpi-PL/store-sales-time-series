@@ -1,6 +1,6 @@
 """Single source of config for the pipeline. Import the `cfg` instance."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 # repo root, two levels up from this file
