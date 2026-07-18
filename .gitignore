@@ -15,3 +15,8 @@ mlruns/
 .idea/
 /submission.csv
 *.zip
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
