@@ -24,16 +24,6 @@ jobs:
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::372468808839:role/github-actions-deploy
-          aws-region: eu-central-1
-
-      - name: Log in to Amazon ECR
-        id: ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
       - name: Build and push image
         env:
           IMAGE: ${{ steps.ecr.outputs.registry }}/store-sales-api:latest
