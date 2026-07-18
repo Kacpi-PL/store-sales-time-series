@@ -1,0 +1,9 @@
+data/raw/
+*.zip
+.git/
+__pycache__/
+venv/
+.venv/
+mlflow.db
+mlruns/
+tests/
