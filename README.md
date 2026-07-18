@@ -10,7 +10,7 @@ Corporación Favorita, using gradient-boosted trees (XGBoost).
 > predictions. On **this branch** the same model becomes a **live web service** — a running
 > program that other apps (or a simple web address) can ask for a forecast and get an answer
 > back instantly. It is packed into a **container** (a standard "box" that runs the same on
-> any computer or cloud) and is on its way to being deployed on **AWS**.
+> any computer or cloud) and is **deployed live on AWS**, reachable over HTTPS.
 >
 > Same model, same numbers — a new, usable way to deliver it.
 
@@ -28,7 +28,7 @@ web address. It doubles as a hands-on way to practise the tools a Cloud/DevOps r
 |---|---|---|
 | **What you get** | a file of predictions (`submission.csv`) | a live service (an **API**) |
 | **How you use it** | run a script once | ask a question, get an answer back |
-| **Packaging** | runs on your machine | packed in a **container** (Docker), deployable to AWS |
+| **Packaging** | runs on your machine | **container** (Docker) **deployed on AWS** via Terraform |
 | **Data needed** | the full 117 MB dataset | a small 8 MB slice, bundled in |
 | **Libraries** | everything (training + tracking) | only the few needed to answer requests |
 
@@ -74,6 +74,25 @@ Real engineering is about sensible compromises. The main ones here, in plain ter
 4. **We work on a branch, not on `main`.** `main` stays clean and always working; the cloud
    experiments live here until they are ready to merge.
 
+## How it is deployed (AWS)
+
+The container is deployed to AWS entirely through **Terraform** (Infrastructure-as-Code) — no
+clicking in the console. The flow:
+
+```
+docker build  →  Amazon ECR (image registry)  →  Amazon ECS Express Mode  →  public HTTPS URL
+```
+
+The ECR repository, the IAM roles, and the container service all live in `infra/main.tf`, so
+the whole stack can be created or torn down with one command (`terraform apply` /
+`terraform destroy`).
+
+**A migration along the way:** it first ran on AWS App Runner, but App Runner is being retired
+(no new customers from April 2026), so it was moved to **Amazon ECS Express Mode** — the
+current recommended service — in a single `terraform apply`. The Docker image, ECR, and IAM
+work all carried over unchanged; only the runtime swapped. That is exactly why infrastructure
+is defined as code.
+
 ## Run the API locally
 
 ```
@@ -116,7 +135,7 @@ honest number.
 
 | Step | State |
 |------|-------|
-| API – live `/forecast` service, runs the real pipeline on the bundled data | done |
-| Docker – container to run the API anywhere | in progress |
-| AWS (App Runner) via Terraform – deploy to the cloud with a public URL | planned |
-| CI/CD – build and deploy automatically on every change | planned |
+| API – live `/forecast` service on the bundled data | done |
+| Docker – container image, pushed to Amazon ECR | done |
+| AWS deploy – ECS Express Mode via Terraform, public HTTPS URL | done |
+| CI/CD – build, push and deploy automatically on every change | planned |
