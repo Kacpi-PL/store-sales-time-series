@@ -1,8 +1,11 @@
-name: CI
+name: CI/CD
 
 on:
   push:
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   lint:
@@ -38,3 +41,42 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+  deploy:
+    needs: [ lint, test ]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/api-cloud'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::372468808839:role/github-actions-deploy
+          aws-region: eu-central-1
+
+      - name: Log in to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/store-sales-api:latest
+        run: |
+          docker build --provenance=false -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Deploy to ECS Express
+        uses: aws-actions/amazon-ecs-deploy-express-service@v1
+        with:
+          service-name: store-sales-express
+          image: ${{ steps.ecr.outputs.registry }}/store-sales-api:latest
+          execution-role-arn: arn:aws:iam::372468808839:role/ecs-express-execution
+          infrastructure-role-arn: arn:aws:iam::372468808839:role/ecs-express-infra
+          container-port: 8080
+          cpu: '256'
+          memory: '1024'
+          health-check-path: /health
