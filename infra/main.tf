@@ -23,6 +23,10 @@ output "repository_url" {
   value = aws_ecr_repository.api.repository_url
 }
 
+variable "service_enabled" {
+  type    = bool
+  default = true
+}
 
 
 resource "aws_iam_role" "ecs_execution" {
@@ -62,6 +66,7 @@ resource "aws_iam_role_policy_attachment" "ecs_infra" {
 
 
 resource "aws_ecs_express_gateway_service" "api" {
+  count                   = var.service_enabled ? 1 : 0
   service_name            = "store-sales-express"
   execution_role_arn      = aws_iam_role.ecs_execution.arn
   infrastructure_role_arn = aws_iam_role.ecs_infra.arn
@@ -76,7 +81,7 @@ resource "aws_ecs_express_gateway_service" "api" {
 }
 
 output "express_ingress" {
-  value = aws_ecs_express_gateway_service.api.ingress_paths
+  value = aws_ecs_express_gateway_service.api[*].ingress_paths
 }
 
 data "tls_certificate" "github" {
@@ -132,4 +137,8 @@ resource "aws_iam_role_policy" "gha_deploy" {
 
 output "github_actions_role_arn" {
   value = aws_iam_role.github_actions.arn
+}
+moved {
+  from = aws_ecs_express_gateway_service.api
+  to   = aws_ecs_express_gateway_service.api[0]
 }
